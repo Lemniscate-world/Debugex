@@ -1,4 +1,4 @@
-# DebugReg
+# Debugex
 A Regex Debugger
 
 RegexInput: User inputs their regex.
