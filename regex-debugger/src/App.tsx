@@ -1,39 +1,83 @@
 import React, { useState } from 'react'
 import { executeRegexStepByStep } from './RegexExecution';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { explainRegex } from './Explanation';
 
-const App: React.FC = () => { 
+const App: React.FC = () => {
   const [regex, setRegex] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [matches, setMatches] = useState<string[]>([]);
   const [currentStep, SetCurrentStep] = useState<number>(0);
 
+  const handleExecute = () => {
+    const stepMatches = executeRegexStepByStep(regex, text);
+    setMatches(stepMatches);
+    SetCurrentStep(0); // Set the current step to 0 when executing the regex
+  }
+
+  const handleNextStep = () => {
+    if (currentStep < matches.length - 1) {
+      SetCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      SetCurrentStep(currentStep - 1);
+    }
+  };
+
+  const explanation = explainRegex(regex);
+
   return (
-    <>
+    <div className="app">
+      <h1>Regex Debugger + Learning Tool</h1>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <label>
+          Regex:
+          <input
+            type="text"
+            value={regex}
+            onChange={(e) => setRegex(e.target.value)}
+            placeholder="Enter your regex"
+          />
+        </label>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+      <div>
+        <label>
+          Text:
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Enter text to match against"
+          />
+        </label>
+      </div>
+      <button onClick={handleExecute}>Execute</button>
+      <div>
+        <button onClick={handlePreviousStep} disabled={currentStep === 0}>
+          Previous Step
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button onClick={handleNextStep} disabled={currentStep === matches.length - 1}>
+          Next Step
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <div>
+        <h2>Explanation:</h2>
+        <p>{explanation}</p>
+      </div>
+      <div>
+        <h2>Matches:</h2>
+        {matches.length > 0 ? (
+          <div style={{ backgroundColor: '#f4f4f4', padding: '10px' }}>
+            <p>Current Match: {matches[currentStep]}</p>
+          </div>
+        ) : (
+          <p>No matches found.</p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default App
